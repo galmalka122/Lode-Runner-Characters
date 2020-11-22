@@ -219,3 +219,4 @@ void Board::setScore() {
 
     m_score += (2 * getCurrLevel());
 }   
+

@@ -20,6 +20,7 @@ private:
 
     bool m_touchrope;
 
+    Location findLadder(char direction);
     void setScore(char upOrDown);
     void setTotalScore(char upOrDown);
     bool handleRegularKey(int c);
@@ -37,6 +38,7 @@ public:
 
     GameController();
     void play();
-    bool isValid(Location objectToMove, std::vector<std::string> &currentMap, Location currentLocation);
+    bool isValidPlayer(Location objectToMove, std::vector<std::string> &currentMap, Location currentLocation);
+    bool isValidEnemy(Location objectToMove, std::vector<std::string>& currentMap, Location currentLocation);
 };
 
