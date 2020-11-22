@@ -4,7 +4,7 @@
 class Enemy {
 
 private:
-
+    std::vector<Location> m_enemyArmy;
     Location m_enemyLocation;
     char m_enemyShape;
     bool m_onLadder;

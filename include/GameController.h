@@ -28,12 +28,14 @@ private:
     void moveOnBoard();
     void handleSpecialKey();
     void gravity(int c);
+    void gravityEnemy();
     char nextStep(Location current, Location destention);
     Location moveEnemy();
     void setNewLevel();
     void setWinningScreen();
     void setMaxScore();
     void gameOver();
+    void endGame();
 public:
 
     GameController();

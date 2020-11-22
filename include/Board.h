@@ -35,7 +35,7 @@ public:
     void setLastLevel(std::vector<std::string> newMap);
     void BuildLevel();
     void clearLevel();
-
+    bool isNextEnemy(Location location)const;
     void printBoard(Player player, Enemy enemy);
 
     std::vector<std::string> getLevel() const;

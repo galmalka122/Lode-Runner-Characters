@@ -193,6 +193,14 @@ bool Board::isNextOnLadder(Location location)const {
     }
     return 0;
 }
+bool Board::isNextEnemy(Location location)const {
+
+    if (m_level[location.row][location.col] == '%') {
+        return 1;
+    }
+    return 0;
+}
+
 
 bool Board::isSpace(Location location)const {
 

@@ -10,6 +10,8 @@ GameController::GameController():m_totalScore(0), m_score(0), m_maxScore(0),
 
 }
 //----------------------------------------------------------------------------
+
+
 void GameController::play(){
 
     for (auto exit = false; !exit;)
@@ -34,22 +36,7 @@ void GameController::play(){
         if (m_player.getCurrentLocation().row == m_enemy.getCurrentLocation().row && m_player.getCurrentLocation().col == m_enemy.getCurrentLocation().col) {
 
             if (m_maxScore != m_score) {
-                if (m_player.getLife() == 0) {
-                    gameOver();
-                    setTotalScore('E');
-                    setScore('L');
-                    m_level.setLevel1();
-                    setNewLevel();
-                    m_player.setLife('F');
-                    setMaxScore();
-                }
-                else {
-                    m_player.setLife('M');
-                    setTotalScore('L');
-                    setScore('L');
-                    m_level.setLastLevel(m_level.getLastLevel());
-                    m_player.setPlayer(m_level.getPlayer());
-                }
+                endGame();
             }  
         }
         else {
@@ -133,7 +120,11 @@ void GameController::handleSpecialKey()
     }
     gravity(c);
     auto dest = moveEnemy();
-   m_enemy.setEnemy(dest);
+    m_enemy.setEnemy(dest);
+    if (!m_enemy.isClimbing(map)) {
+        m_enemy.setOnLadder(0);
+    }
+    gravityEnemy();
    //m_enemy.enemyClear();
 }
 //----------------------------------------------------------------------------
@@ -228,6 +219,11 @@ bool GameController::isValidPlayer(Location destination, std::vector<std::string
         return 1;
     }
 
+    else if (m_level.isNextEnemy(destination)) {
+        endGame();
+        return 1;
+    }
+
     if (m_level.isNextCoin(destination)) {
         setScore('U');
         setTotalScore('A');
@@ -317,6 +313,88 @@ void GameController::gravity(int c) {
 
     }
 }
+
+void GameController::gravityEnemy() {
+    auto location = m_enemy.getCurrentLocation();
+    auto map = m_level.getLevel();
+    auto moveObjectPos = location.row + 1;
+    auto backwardLadder = location.col;
+    bool isRope = 0;
+
+    if (!m_enemy.isClimbing(map) && !m_level.isNextOnLadder(Location(moveObjectPos, location.col))) {
+        while (map[moveObjectPos][location.col] != '#' && !m_level.isNextOnRope(Location(location.row, location.col))) {
+            /*if (m_player.isOnRope(m_level.getLevel())) {
+                map[location.row][location.col] = '-';
+                isRope = 1;
+                break;
+            }*/
+            /*if (m_touchrope) {
+                m_level.printBoard(m_player, m_enemy); //delete
+                if (map[m_player.findLocation(c, 'L').row][m_player.findLocation(c, 'L').col] == 'S') {
+                    if (map[m_player.findLocation(c, 'L').row - 1][m_player.findLocation(c, 'L').col] == '-') {
+                        if (c == KB_RIGHT) {
+                            backwardLadder--;
+                        }
+                        else
+                            backwardLadder++;
+                        map[location.row][backwardLadder] = ' ';
+                    }
+                    else {
+                        if (c == KB_RIGHT) {
+                            backwardLadder--;
+                        }
+                        else
+                            backwardLadder++;
+                        map[location.row][backwardLadder] = 'H';
+                    }
+                }*/
+                //bug when jumping from rope to other rope
+                /*if (map[m_player.findLocation(c, 'L').row][m_player.findLocation(c, 'L').col] == '-') {
+                    if (c == KB_RIGHT) {
+                        backwardLadder--;
+                    }
+                    else
+                        backwardLadder++;
+                    map[location.row][backwardLadder] = 'H';
+                }
+                map[location.row][location.col] = '-';
+                m_touchrope = 0;
+            }
+            else {*
+                if (m_level.isNextCoin(Location(location.row + 1, location.col)))
+                {
+
+                    setScore('U');
+                    setTotalScore('A');
+
+                }
+                map[location.row][location.col] = ' ';
+                }*/
+            m_level.setLevel(map);
+            m_enemy.setEnemy(Location(location.row + 1, location.col));
+            if (m_level.getLevel()[m_player.getCurrentLocation().row][m_player.getCurrentLocation().col] == '-') {
+                m_touchrope = 1;
+            }
+
+            location.row++;
+            moveObjectPos++;
+            m_level.printBoard(m_player, m_enemy);
+        }
+        if (isRope) {
+            map[location.row][location.col] = '-';
+            m_player.setShape('S');
+            m_level.setLevel(map);
+            m_player.setPlayer(Location(location.row + 1, location.col));
+            m_level.printBoard(m_player, m_enemy);
+        }
+        if (m_player.isOnRope(m_level.getLevel())) {
+            m_player.setShape('S');
+        }
+
+    }
+}
+
+
 //----------------------------------------------------------------------------
 char GameController::nextStep(Location current, Location destention) {
 
@@ -463,6 +541,7 @@ bool GameController::isValidEnemy(Location destination, std::vector<std::string>
         else {
             currentMap[destination.row][currentLocation.col] = ' ';
         }
+        m_enemy.setOnLadder(1);
         return 0;
     }
     else if (m_enemy.isClimbing(m_level.getLastLevel())) {
@@ -471,14 +550,7 @@ bool GameController::isValidEnemy(Location destination, std::vector<std::string>
     }
     else if (m_player.getCurrentLocation().col == m_enemy.getCurrentLocation().col &&
              m_player.getCurrentLocation().row == m_enemy.getCurrentLocation().row) {
-        m_player.setLife('M');
-        setTotalScore('L');
-        setScore('L');
-        m_level.setLevel(m_level.getLastLevel());
-        m_player.setPlayer(m_level.getPlayer());
-        m_enemy.setEnemy(m_level.getEnemy());
-        
-
+             endGame();
     }
     currentMap[currentLocation.row][currentLocation.col] = ' ';
 
@@ -613,3 +685,22 @@ void GameController::gameOver()
 
 }
 //----------------------------------------------------------------------------
+void GameController::endGame() {
+    if (m_player.getLife() == 0) {
+        gameOver();
+        setTotalScore('E');
+        setScore('L');
+        m_level.setLevel1();
+        setNewLevel();
+        m_player.setLife('F');
+        setMaxScore();
+    }
+    else {
+        m_player.setLife('M');
+        setTotalScore('L');
+        setScore('L');
+        m_level.setLastLevel(m_level.getLastLevel());
+        m_player.setPlayer(m_level.getPlayer());
+        m_enemy.setEnemy(m_level.getEnemy());
+    }
+}
