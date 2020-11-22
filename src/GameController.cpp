@@ -223,11 +223,18 @@ bool GameController::isValidPlayer(Location destination, std::vector<std::string
         endGame();
         return 1;
     }
+    
+    else if (m_level.getLevel()[destination.row][destination.col] == '-') {
+        m_touchrope = 1;
+        currentMap[currentLocation.row][currentLocation.col] = ' ';
+        return 0;
+    }
 
     if (m_level.isNextCoin(destination)) {
         setScore('U');
         setTotalScore('A');
     }
+
     currentMap[currentLocation.row][currentLocation.col] = ' ';
     
     return 0;
@@ -491,7 +498,7 @@ Location GameController::findLadder(char direction) {
     if (m_player.getCurrentLocation().col < location.col) {
         while (map[location.row][i] != '#') {
             if (map[directionToMove][i] == 'H') {
-                return(Location(location.row, location.col--));
+                return(Location(location.row, location.col-1));
             }
             i--;
         }
@@ -503,10 +510,10 @@ Location GameController::findLadder(char direction) {
             }
             i++;
         }
-    
+    i = location.col;
     while (map[location.row][i] != '#') {
         if (map[directionToMove][i] == 'H') {
-            return(Location(location.row, location.col--));
+            return(Location(location.row, location.col-1));
         }
         i--;
     }
