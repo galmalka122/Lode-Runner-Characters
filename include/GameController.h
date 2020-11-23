@@ -19,7 +19,7 @@ private:
     int m_maxScore;
 
     bool m_touchrope;
-
+    Location findRope(int i);
     Location findLadder(char direction, int i);
     void setScore(char upOrDown);
     void setTotalScore(char upOrDown);
@@ -30,6 +30,11 @@ private:
     void gravity(int c);
     void gravityEnemy(int i);
     char nextStep(Location current, Location destention);
+    Location moveToLadder();
+
+
+
+
     Location moveEnemy(int i);
     void setNewLevel();
     void setWinningScreen();

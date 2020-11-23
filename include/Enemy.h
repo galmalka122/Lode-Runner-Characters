@@ -4,11 +4,12 @@
 class Enemy {
 
 private:
-    std::vector<Location> m_enemyArmy;
+
     Location m_enemyLocation;
     char m_enemyShape;
     bool m_onLadder;
     bool m_onCoin;
+    bool m_onRope;
     
 public:
     Enemy();
@@ -20,9 +21,11 @@ public:
     void setShape(char shape);
     void setCoin(int On);
     bool getOnCoin();
-    bool isOnRope(std::vector<std::string> level)const;
     void setOnLadder(int On);
-    bool getOnLadder();
+    bool getOnLadder()const;
+    bool isOnRope(std::vector<std::string> level)const;
     bool isClimbing(std::vector<std::string> level)const;
+    void setOnRope(int On);
+    bool getOnRope()const;
 };
 

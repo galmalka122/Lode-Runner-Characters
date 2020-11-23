@@ -1,0 +1,21 @@
+# ninja log v5
+0	986	627848433	CMakeFiles/oop1_ex02.dir/src/GameController.cpp.obj	1516c5fe2a181182
+1	1153	627847952	CMakeFiles/oop1_ex02.dir/src/main.cpp.obj	f7941e328214836c
+3	732	627840236	CMakeFiles/oop1_ex02.dir/src/io.cpp.obj	16043ee8d9ce553d
+4	1170	627846553	CMakeFiles/oop1_ex02.dir/src/Enemy.cpp.obj	89dafc9f0325ba63
+1	137	627843956	build.ninja	dbfd618469141a02
+3	1152	627846553	CMakeFiles/oop1_ex02.dir/src/Player.cpp.obj	510c941aff8f8f9a
+9	1238	627846553	CMakeFiles/oop1_ex02.dir/src/Board.cpp.obj	650b383398af4a17
+986	1135	627848433	oop1_ex02.exe	94b3df6990bb7ffb
+0	983	627848566	CMakeFiles/oop1_ex02.dir/src/GameController.cpp.obj	1516c5fe2a181182
+984	1135	627848566	oop1_ex02.exe	94b3df6990bb7ffb
+0	1105	627848720	CMakeFiles/oop1_ex02.dir/src/GameController.cpp.obj	1516c5fe2a181182
+1105	1245	627848720	oop1_ex02.exe	94b3df6990bb7ffb
+0	1137	627849102	CMakeFiles/oop1_ex02.dir/src/GameController.cpp.obj	1516c5fe2a181182
+1137	1275	627849102	oop1_ex02.exe	94b3df6990bb7ffb
+0	1112	627849295	CMakeFiles/oop1_ex02.dir/src/GameController.cpp.obj	1516c5fe2a181182
+1113	1252	627849296	oop1_ex02.exe	94b3df6990bb7ffb
+1	1142	627849355	CMakeFiles/oop1_ex02.dir/src/GameController.cpp.obj	1516c5fe2a181182
+1142	1285	627849356	oop1_ex02.exe	94b3df6990bb7ffb
+0	1013	627849533	CMakeFiles/oop1_ex02.dir/src/GameController.cpp.obj	1516c5fe2a181182
+1013	1173	627849533	oop1_ex02.exe	94b3df6990bb7ffb

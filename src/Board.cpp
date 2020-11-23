@@ -15,20 +15,20 @@ void Board::printBoard(Player player, std::vector<Enemy> enemy) {
     auto enemys = 0;
     system("cls");
     Screen::resetLocation();
-
-    for (unsigned int i = 0; i < m_size; i++) {
-        if (i == player.getCurrentLocation().row)
-            m_level[i][player.getCurrentLocation().col] = player.getShape();
-        for (unsigned int j = 0; j < m_size; j++) {
-            if (enemys < getArmySize()&& i == enemy[enemys].getCurrentLocation().row &&
-                j == enemy[enemys].getCurrentLocation().col) {
-                m_level[i][enemy[enemys].getCurrentLocation().col] = '%';
-                enemys++;
-                break;
+    for (enemys = 0; enemys < getArmySize(); enemys++) {
+        for (unsigned int i = 0; i < m_size; i++) {
+            if (i == player.getCurrentLocation().row)
+                m_level[i][player.getCurrentLocation().col] = player.getShape();
+            for (unsigned int j = 0; j < m_size; j++) {
+                if (i == enemy[enemys].getCurrentLocation().row &&
+                    j == enemy[enemys].getCurrentLocation().col) {
+                    m_level[i][enemy[enemys].getCurrentLocation().col] = '%';
+                }
             }
         }
-        std::cout << m_level[i] << std::endl;
     }
+    for (int i = 0; i < m_size; i++)
+        std::cout << m_level[i] << std::endl;
 }
 int Board::getBoundings() const
 {
@@ -116,7 +116,7 @@ int Board::getCoinsCount() const
 }
 char Board::getCurrentChar(const Location currentLocation) 
 {
-    return m_level[currentLocation.row][currentLocation.col];
+    return m_restartLevel[currentLocation.row][currentLocation.col];
 }
 
 
@@ -136,6 +136,7 @@ void Board::BuildLevel()
         std::getline(m_maps, line);
         m_level.push_back(line);
     }
+    setArmySize(getEnemyCount());
     m_restartLevel = m_level;
     m_score = 0;
     m_maxScore = getCoinsCount() * 2 * getCurrLevel();
@@ -148,8 +149,6 @@ void Board::clearLevel()
 
 int Board::getEnemyCount()const
 {
-    
-
     unsigned int height_index = 0, width_index = 0,counter=0;
     for (height_index = 0; height_index < m_size; height_index++) {
 

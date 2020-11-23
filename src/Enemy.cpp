@@ -3,7 +3,7 @@
 #include "Enemy.h"
 
 Enemy::Enemy() : m_enemyLocation(Location(0, 0)), m_enemyShape('%'), m_onLadder(0)
-                , m_onCoin(0){}
+                , m_onCoin(0), m_onRope(0){}
 
 void Enemy::setEnemy(Location location) {
 
@@ -72,6 +72,12 @@ bool Enemy::getOnCoin() {
     return m_onCoin;
 }
 
-bool Enemy::getOnLadder() {
+bool Enemy::getOnLadder()const {
     return  m_onLadder;
+}
+void Enemy::setOnRope(int On) {
+    m_onRope = On;
+}
+bool Enemy::getOnRope()const {
+    return m_onRope;
 }
