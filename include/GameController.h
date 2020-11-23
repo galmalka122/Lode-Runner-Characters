@@ -10,7 +10,7 @@ private:
 
     Board m_level;
     Player m_player;
-    Enemy m_enemy;
+    std::vector<Enemy>m_enemyArmy;
 
     unsigned int  m_coinsCount;
 
@@ -20,7 +20,7 @@ private:
 
     bool m_touchrope;
 
-    Location findLadder(char direction);
+    Location findLadder(char direction, int i);
     void setScore(char upOrDown);
     void setTotalScore(char upOrDown);
     bool handleRegularKey(int c);
@@ -28,19 +28,21 @@ private:
     void moveOnBoard();
     void handleSpecialKey();
     void gravity(int c);
-    void gravityEnemy();
+    void gravityEnemy(int i);
     char nextStep(Location current, Location destention);
-    Location moveEnemy();
+    Location moveEnemy(int i);
     void setNewLevel();
     void setWinningScreen();
     void setMaxScore();
     void gameOver();
     void endGame();
+    void setArmy();
+    bool hitEnemy();
 public:
 
     GameController();
     void play();
     bool isValidPlayer(Location objectToMove, std::vector<std::string> &currentMap, Location currentLocation);
-    bool isValidEnemy(Location objectToMove, std::vector<std::string>& currentMap, Location currentLocation);
+    bool isValidEnemy(Location objectToMove, std::vector<std::string>& currentMap, Location currentLocation, int i);
 };
 

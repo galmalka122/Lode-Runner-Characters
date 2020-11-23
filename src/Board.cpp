@@ -8,23 +8,43 @@ Board::Board(): m_size (0), m_currentLevel (0){
         exit(EXIT_FAILURE);
     }
     BuildLevel();
+    setArmySize(getEnemyCount());
 }
 
-void Board::printBoard(Player player,Enemy enemy) {
-    
+void Board::printBoard(Player player, std::vector<Enemy> enemy) {
+    auto enemys = 0;
     system("cls");
     Screen::resetLocation();
+
     for (unsigned int i = 0; i < m_size; i++) {
         if (i == player.getCurrentLocation().row)
             m_level[i][player.getCurrentLocation().col] = player.getShape();
-        if (i == enemy.getCurrentLocation().row && i != 0)
-            m_level[i][enemy.getCurrentLocation().col] = '%';
+        for (unsigned int j = 0; j < m_size; j++) {
+            if (enemys < getArmySize()&& i == enemy[enemys].getCurrentLocation().row &&
+                j == enemy[enemys].getCurrentLocation().col) {
+                m_level[i][enemy[enemys].getCurrentLocation().col] = '%';
+                enemys++;
+                break;
+            }
+        }
         std::cout << m_level[i] << std::endl;
     }
 }
 int Board::getBoundings() const
 {
     return m_size;
+}
+int Board::getArmySize() const
+{
+
+    return m_armySize;
+
+}
+void Board::setArmySize(int size)
+{
+
+    m_armySize = size;
+
 }
 std::vector<std::string> Board::getLevel() const 
 {
@@ -126,7 +146,7 @@ void Board::clearLevel()
     m_level.clear();
 }
 
-int Board::getEnemyCount() const
+int Board::getEnemyCount()const
 {
     
 
@@ -145,15 +165,13 @@ int Board::getEnemyCount() const
 
 Location Board::getEnemy() {
 
-    unsigned int height_index = 0, width_index = 0,curCounter = getEnemyCount();
+    unsigned int height_index = 0, width_index = 0;
     for (height_index = 0; height_index < m_size; height_index++) {
 
         for (width_index = 0; width_index < m_size; width_index++) {
             if (m_level[height_index][width_index] == '%') {
                 m_level[height_index][width_index] = ' ';
-                curCounter --;
-                if (curCounter == 0)
-                    return Location(height_index,width_index);
+                return Location(height_index,width_index);
             }
 
         }
