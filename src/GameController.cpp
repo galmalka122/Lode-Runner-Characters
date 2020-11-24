@@ -13,6 +13,7 @@ GameController::GameController():m_totalScore(0), m_score(0), m_maxScore(0),
 
 void GameController::setArmy() {
     Enemy enemy;
+    m_enemyArmy.clear();
     for (int i = 0; i < m_level.getArmySize(); i++) {
         enemy.setEnemy(m_level.getEnemy());
         m_enemyArmy.push_back(enemy);
@@ -124,16 +125,23 @@ void GameController::handleSpecialKey()
             std::cout << "Unknown special key pressed (code = " << c << ")\n";
             break;
     }
-    gravity(c);
-    for (int i = 0; i < m_level.getArmySize(); i++) {
+    for (int i = 0; i < m_enemyArmy.size(); i++) {
         auto dest = moveEnemy(i);
+        if (map[dest.row][dest.col] == '%') {
+            m_enemyArmy.erase(m_enemyArmy.begin() + i);
+            m_level.setArmySize(m_enemyArmy.size());
+            map[location.row][location.col] = ' ';
+        }
+        if (i >= m_enemyArmy.size()) {
+            break;
+        }
         m_enemyArmy[i].setEnemy(dest);
 
         if (!m_enemyArmy[i].isClimbing(map)) {
             m_enemyArmy[i].setOnLadder(0);
         }
             gravityEnemy(i);
-        
+            gravity(c);
     }
    //m_enemy.enemyClear();
 }
@@ -151,7 +159,7 @@ bool GameController::isValidPlayer(Location destination, std::vector<std::string
         if (m_player.getShape() == 'S') {
 
             //if the next move is rope and current position is ladder
-            if (m_level.isNextOnRope(destination) && m_player.isOnLadder(m_level.getLevel())) {
+            if (m_level.isNextOnRope(destination) && m_level.getCurrentChar(m_player.getCurrentLocation()) == 'H') {
                 currentMap[currentLocation.row][currentLocation.col] = 'H';
             }
             //if the next move is rope
@@ -259,14 +267,14 @@ void GameController::gravity(int c) {
     bool isRope = 0;
 
     if (m_player.getShape() != 'S' && !m_level.isNextOnLadder(Location(moveObjectPos, location.col))) {
-        while (map[moveObjectPos][location.col] != '#'&& !m_level.isNextOnRope(Location(location.row, location.col))) {
+        while (map[moveObjectPos][location.col] != '#'&& map[moveObjectPos][location.col] != 'H' &&
+            !m_level.isNextOnRope(Location(location.row, location.col))) {
             if (m_player.isOnRope(m_level.getLevel())) {
                 map[location.row][location.col] = '-';
                 isRope = 1;
                 break;
             }
             if (m_touchrope) {
-                m_level.printBoard(m_player,m_enemyArmy); //delete
                 if (map[m_player.findLocation(c, 'L').row][m_player.findLocation(c, 'L').col] == 'S') {
                     if (map[m_player.findLocation(c, 'L').row - 1][m_player.findLocation(c, 'L').col] == '-') {
                         if (c == KB_RIGHT) {
@@ -292,20 +300,18 @@ void GameController::gravity(int c) {
                     }
                     else
                         backwardLadder++;
-                    map[location.row][backwardLadder] = 'H';
+                    map[location.row][backwardLadder] = '-';
                 }
                 map[location.row][location.col] = '-';
                 m_touchrope = 0;
             }
             else {
-                if (m_level.isNextCoin(Location(location.row + 1, location.col)))
-                {
-
-                    setScore('U');
-                    setTotalScore('A');
-
-                }
                 map[location.row][location.col] = ' ';
+            }
+            if (m_level.isNextCoin(Location(location.row + 1, location.col)))
+            {
+                setScore('U');
+                setTotalScore('A');
             }
             m_level.setLevel(map);
             m_player.setPlayer(Location(location.row + 1, location.col));
@@ -315,14 +321,15 @@ void GameController::gravity(int c) {
             
             location.row++;
             moveObjectPos++;
-            m_level.printBoard(m_player,m_enemyArmy);
+            std::system("cls");
+            moveOnBoard();
         }
         if (isRope) {
             map[location.row][location.col] = '-';
             m_player.setShape('S');
             m_level.setLevel(map);
             m_player.setPlayer(Location(location.row + 1, location.col));
-            m_level.printBoard(m_player,m_enemyArmy);
+            moveOnBoard();
         }
         if (m_player.isOnRope(m_level.getLevel())) {
             m_player.setShape('S');
@@ -339,54 +346,8 @@ void GameController::gravityEnemy(int i) {
     bool isRope = 0;
 
     if (!m_enemyArmy[i].isClimbing(map) && !m_level.isNextOnLadder(Location(moveObjectPos, location.col))) {
-        while (map[moveObjectPos][location.col] != '#' && !m_level.isNextOnRope(Location(location.row, location.col))) {
-            /*if (m_player.isOnRope(m_level.getLevel())) {
-                map[location.row][location.col] = '-';
-                isRope = 1;
-                break;
-            }*/
-            /*if (m_touchrope) {
-                m_level.printBoard(m_player, m_enemy); //delete
-                if (map[m_player.findLocation(c, 'L').row][m_player.findLocation(c, 'L').col] == 'S') {
-                    if (map[m_player.findLocation(c, 'L').row - 1][m_player.findLocation(c, 'L').col] == '-') {
-                        if (c == KB_RIGHT) {
-                            backwardLadder--;
-                        }
-                        else
-                            backwardLadder++;
-                        map[location.row][backwardLadder] = ' ';
-                    }
-                    else {
-                        if (c == KB_RIGHT) {
-                            backwardLadder--;
-                        }
-                        else
-                            backwardLadder++;
-                        map[location.row][backwardLadder] = 'H';
-                    }
-                }*/
-                //bug when jumping from rope to other rope
-                /*if (map[m_player.findLocation(c, 'L').row][m_player.findLocation(c, 'L').col] == '-') {
-                    if (c == KB_RIGHT) {
-                        backwardLadder--;
-                    }
-                    else
-                        backwardLadder++;
-                    map[location.row][backwardLadder] = 'H';
-                }
-                map[location.row][location.col] = '-';
-                m_touchrope = 0;
-            }
-            else {*
-                if (m_level.isNextCoin(Location(location.row + 1, location.col)))
-                {
-
-                    setScore('U');
-                    setTotalScore('A');
-
-                }
-                map[location.row][location.col] = ' ';
-                }*/
+        while (map[moveObjectPos][location.col] != '#' && map[moveObjectPos][location.col] != 'H' && 
+            !m_level.isNextOnRope(Location(location.row, location.col))) {
             m_level.setLevel(map);
             m_enemyArmy[i].setEnemy(Location(location.row + 1, location.col));
             if (m_level.getLevel()[m_player.getCurrentLocation().row][m_player.getCurrentLocation().col] == '-') {
@@ -395,7 +356,8 @@ void GameController::gravityEnemy(int i) {
 
             location.row++;
             moveObjectPos++;
-            m_level.printBoard(m_player, m_enemyArmy);
+            std::system("cls");
+            moveOnBoard();
         }
         if (isRope) {
             map[location.row][location.col] = '-';
@@ -436,17 +398,26 @@ Location GameController::moveEnemy(int i) {
     auto map = m_level.getLevel();
     auto location = m_enemyArmy[i].getCurrentLocation();
     Location destLadder(0,0),destRope(0,0);
-
-    
     if (m_player.getCurrentLocation().row < location.row ) {
         destLadder = findLadder('U',i);
-        if (m_enemyArmy[i].isOnLadder(map) || m_level.getCurrentChar(m_enemyArmy[i].getCurrentLocation()) == 'H') {
+        if (m_level.getCurrentChar(m_enemyArmy[i].getCurrentLocation()) == 'H') {
             if (m_enemyArmy[i].getOnLadder()) {
-                map[location.row][location.col] = 'H';
+                map[location.row][location.col] = m_level.getCurrentChar(location);
                 m_level.setLevel(map);
                 return Location(location.row - 1, location.col);
             }
-            map[location.row][location.col] = ' ';
+            map[location.row][location.col] = m_level.getCurrentChar(location);
+            m_level.setLevel(map);
+            m_enemyArmy[i].setOnLadder(1);
+            return Location(location.row - 1, location.col);
+        }
+        if (m_level.getCurrentChar(Location(location.row - 1, location.col)) == 'H') {
+            if (m_enemyArmy[i].getOnLadder()) {
+                map[location.row][location.col] = m_level.getCurrentChar(location);
+                m_level.setLevel(map);
+                return Location(location.row - 1, location.col);
+            }
+            map[location.row][location.col] = m_level.getCurrentChar(location);
             m_level.setLevel(map);
             m_enemyArmy[i].setOnLadder(1);
             return Location(location.row - 1, location.col);
@@ -458,11 +429,24 @@ Location GameController::moveEnemy(int i) {
         return(destLadder);
 
     }
-    else if (m_player.getCurrentLocation().row > location.row) {
+    else if (m_player.getCurrentLocation().row > location.row)
+    {
+
         if (m_enemyArmy[i].isOnRope(map)) {
-            map[location.row][location.col] = ' ';
+            map[location.row][location.col] = m_level.getCurrentChar(location);
             m_level.setLevel(map);
             m_enemyArmy[i].setOnRope(0);
+            return Location(location.row + 1, location.col);
+        }
+        if (m_level.getCurrentChar(Location(location.row + 1, location.col)) == 'H') {
+            if (m_enemyArmy[i].getOnLadder()) {
+                map[location.row][location.col] = m_level.getCurrentChar(location);
+                m_level.setLevel(map);
+                return Location(location.row + 1, location.col);
+            }
+            map[location.row][location.col] = m_level.getCurrentChar(location);
+            m_level.setLevel(map);
+            m_enemyArmy[i].setOnLadder(1);
             return Location(location.row + 1, location.col);
         }
         destLadder = findLadder('D', i);
@@ -473,7 +457,7 @@ Location GameController::moveEnemy(int i) {
                 if (m_enemyArmy[i].isOnRope(map) ||
                     m_level.getCurrentChar(Location(location.row - 1, location.col)) == '-') {
 
-                    map[location.row][location.col] = ' ';
+                    map[location.row][location.col] = m_level.getCurrentChar(location);
                     m_level.setLevel(map);
                     m_enemyArmy[i].setOnRope(1);
                     return Location(location.row + 1, location.col);
@@ -484,31 +468,23 @@ Location GameController::moveEnemy(int i) {
                 m_level.setLevel(map);
                 return(destRope);
             }
-            else {
-                if (m_enemyArmy[i].isOnLadder(map) || m_level.getCurrentChar(m_enemyArmy[i].getCurrentLocation()) == 'H') {
-                    if (m_enemyArmy[i].getOnLadder()) {
-                        map[location.row][location.col] = 'H';
-                        m_level.setLevel(map);
-                        return Location(location.row + 1, location.col);
-                    }
-                    map[location.row][location.col] = ' ';
-                    m_level.setLevel(map);
-                    m_enemyArmy[i].setOnLadder(1);
-                    return Location(location.row + 1, location.col);
-                }
-                if (isValidEnemy(destLadder, map, location, i)) {
-                    return(location);
-                }
-                m_level.setLevel(map);
-                return(destLadder);
+
+            if (isValidEnemy(destLadder, map, location, i)) {
+                return(location);
             }
+            m_level.setLevel(map);
+            return(destLadder);
         }
+    
+           
+    
+        
         else if (destLadder.col == 0) {
 
             if (m_enemyArmy[i].isOnRope(map) ||
                 m_level.getCurrentChar(Location(location.row - 1, location.col)) == '-') {
 
-                map[location.row][location.col] = ' ';
+                map[location.row][location.col] = m_level.getCurrentChar(location);
                 m_level.setLevel(map);
                 m_enemyArmy[i].setOnRope(1);
                 return Location(location.row + 1, location.col);
@@ -520,13 +496,24 @@ Location GameController::moveEnemy(int i) {
             return(destRope);
         }
         else {
-            if (m_enemyArmy[i].isOnLadder(map) || m_level.getCurrentChar(m_enemyArmy[i].getCurrentLocation()) == 'H') {
+            if (m_level.getCurrentChar(m_enemyArmy[i].getCurrentLocation()) == 'H') {
                 if (m_enemyArmy[i].getOnLadder()) {
-                    map[location.row][location.col] = 'H';
+                    map[location.row][location.col] = m_level.getCurrentChar(location);
                     m_level.setLevel(map);
                     return Location(location.row + 1, location.col);
                 }
-                map[location.row][location.col] = ' ';
+                map[location.row][location.col] = m_level.getCurrentChar(location);
+                m_level.setLevel(map);
+                m_enemyArmy[i].setOnLadder(1);
+                return Location(location.row + 1, location.col);
+            }
+            if (m_level.getCurrentChar(Location(location.row + 1, location.col)) == 'H') {
+                if (m_enemyArmy[i].getOnLadder()) {
+                    map[location.row][location.col] = m_level.getCurrentChar(location);
+                    m_level.setLevel(map);
+                    return Location(location.row + 1, location.col);
+                }
+                map[location.row][location.col] = m_level.getCurrentChar(location);
                 m_level.setLevel(map);
                 m_enemyArmy[i].setOnLadder(1);
                 return Location(location.row + 1, location.col);
@@ -663,6 +650,9 @@ bool GameController::isValidEnemy(Location destination,
         return 0;
     }
     else if (m_enemyArmy[i].isClimbing(m_level.getLastLevel())) {
+        if (currentMap[destination.row][destination.col] == '%') {
+            currentMap[currentLocation.row][currentLocation.col] = m_level.getCurrentChar(currentLocation);
+        }
             currentMap[currentLocation.row][currentLocation.col] = 'H';
             return 0;
     }
@@ -685,13 +675,15 @@ bool GameController::isValidEnemy(Location destination,
 void GameController::setNewLevel() {
 
     m_totalScore += (50 * m_level.getCurrLevel());
-    setMaxScore();
+    std::system("cls");
     m_level.clearLevel();
     m_level.BuildLevel();
     //while for more enemys
     m_level.setLevel(m_level.getLevel());
+    m_player.setShape('@');
     m_enemyArmy.clear();
     setArmy();
+    setMaxScore();
     m_player.playerClear();
     m_player.setPlayer(m_level.getPlayer());
 
@@ -711,9 +703,11 @@ void GameController::setWinningScreen() {
 */
 void GameController::moveOnBoard() {
 
-    std::system("cls");
     Screen::resetLocation();
     m_level.printBoard(m_player, m_enemyArmy);
+    std::cout << "LIFE: " << m_player.getLife()+1 << std::endl
+        << "SCORE: " << m_totalScore << std::endl
+        << "LEVEL " << m_level.getCurrLevel()<<std::endl;
 
 }
 //----------------------------------------------------------------------------
@@ -732,7 +726,7 @@ void GameController::setScore(char upOrDown) {
 
     else if (upOrDown == 'L')
 
-        m_score -= m_score;
+        m_score =0;
 }
 //----------------------------------------------------------------------------
 /*
@@ -763,37 +757,15 @@ void GameController::setMaxScore() {
 }
 void GameController::gameOver()
 {
+    system("cls");
+    Screen::resetLocation();
+    std::cout << "GAME OVER!\nPress Enter to restart game.";
     m_level.clearLevel();
-    std::vector<std::string> b;
-    for (int i = 0; i < m_level.getBoundings(); i++) {
-        auto a = std::string();
-        for (int j = 0; j < m_level.getBoundings(); j++) {
-            if (i != m_level.getBoundings() / 2)
-                a.push_back('#');
-            else if (i == m_level.getBoundings() / 2 && j != (m_level.getBoundings() / 2) - 4)
-                a.push_back('#');
-            else if (i == m_level.getBoundings() / 2 && j == (m_level.getBoundings() / 2) - 4) {
-                a.push_back('G');
-                a.push_back('A');
-                a.push_back('M');
-                a.push_back('E');
-                a.push_back(' ');
-                a.push_back('O');
-                a.push_back('V');
-                a.push_back('E');
-                a.push_back('R');
-                j = j + 8;
-            }
-            
-        }
-        b.push_back(a);
-    }
-    m_level.setLevel(b);
     m_enemyArmy.clear();
     m_player.playerClear();
-    m_level.printBoard(m_player, m_enemyArmy);
-    getchar();
+    m_totalScore = 0;
     m_level.resetGame();
+    getchar();
 
 }
 //----------------------------------------------------------------------------
@@ -808,17 +780,21 @@ void GameController::endGame() {
         setMaxScore();
     }
     else {
+        m_level.clearLevel();
         m_player.setLife('M');
         setTotalScore('L');
         setScore('L');
         m_enemyArmy.clear();
+        m_player.playerClear();
+        m_player.setShape('@');
         m_level.setLastLevel(m_level.getLastLevel());
         m_player.setPlayer(m_level.getPlayer());
+        m_level.setArmySize(m_level.getEnemyCount());
         setArmy();
     }
 }
 bool GameController::hitEnemy() {
-    for (int i = 0; i < m_level.getEnemyCount(); i++) {
+    for (int i = 0; i < m_level.getArmySize(); i++) {
         if (m_player.getCurrentLocation().row == m_enemyArmy[i].getCurrentLocation().row &&
             m_player.getCurrentLocation().col == m_enemyArmy[i].getCurrentLocation().col) {
             return 1;

@@ -13,7 +13,6 @@ Board::Board(): m_size (0), m_currentLevel (0){
 
 void Board::printBoard(Player player, std::vector<Enemy> enemy) {
     auto enemys = 0;
-    system("cls");
     Screen::resetLocation();
     for (enemys = 0; enemys < getArmySize(); enemys++) {
         for (unsigned int i = 0; i < m_size; i++) {
@@ -205,7 +204,7 @@ bool Board::isNextOnRope(Location location)const {
 
 bool Board::isNextOnLadder(Location location)const {
 
-    if (m_level[location.row][location.col] == 'H') {
+    if (m_restartLevel[location.row][location.col] == 'H') {
         return 1;
     }
     return 0;
