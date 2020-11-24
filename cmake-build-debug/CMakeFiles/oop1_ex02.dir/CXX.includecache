@@ -1,0 +1,112 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/Board.h
+iostream
+-
+cstdlib
+-
+fstream
+-
+string
+-
+vector
+-
+sstream
+-
+io.h
+../include/io.h
+windows.h
+../include/windows.h
+Location.h
+../include/Location.h
+Player.h
+../include/Player.h
+Enemy.h
+../include/Enemy.h
+
+../include/Enemy.h
+Location.h
+../include/Location.h
+Board.h
+../include/Board.h
+
+../include/GameController.h
+Player.h
+../include/Player.h
+Board.h
+../include/Board.h
+Enemy.h
+../include/Enemy.h
+io.h
+../include/io.h
+cstdlib
+-
+
+../include/Location.h
+
+../include/Player.h
+Location.h
+../include/Location.h
+Board.h
+../include/Board.h
+
+../include/io.h
+Location.h
+../include/Location.h
+
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/include/Location.h
+
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/include/Player.h
+Location.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/include/Location.h
+Board.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/include/Board.h
+
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Board.cpp
+Board.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Board.h
+
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Enemy.cpp
+../include/Player.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/include/Player.h
+Board.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Board.h
+Enemy.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Enemy.h
+
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/GameController.cpp
+GameController.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/GameController.h
+
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Player.cpp
+../include/Player.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/include/Player.h
+Board.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Board.h
+Player.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Player.h
+
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/io.cpp
+io.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/io.h
+Windows.h
+-
+conio.h
+-
+vector
+-
+optional
+-
+
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/main.cpp
+Player.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/Player.h
+GameController.h
+C:/Users/gal and eden/CLionProjects/keyboardExample/ex02_Gal_Malka_Yaniv_Sonino/src/GameController.h
+
