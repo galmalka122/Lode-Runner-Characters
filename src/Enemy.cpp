@@ -1,31 +1,22 @@
-#include "..\include\Player.h"
 #include "Board.h"
 #include "Enemy.h"
 
 Enemy::Enemy() : m_enemyLocation(Location(0, 0)), m_enemyShape('%'), m_onLadder(0)
                 , m_onCoin(0), m_onRope(0){}
 
-void Enemy::setEnemy(Location location) {
-
+void Enemy::setEnemy(Location location)
+{
 	m_enemyLocation = location;
-
 }
 
-void Enemy::setShape(char shape) {
-
+void Enemy::setShape(char shape) 
+{
 	m_enemyShape = '%';
-
 }
 
-Location Enemy::getCurrentLocation()const {
-
+Location Enemy::getCurrentLocation()const
+{
 	return m_enemyLocation;
-}
-
-bool Enemy::isValidMove()const {
-
-
-	return 0;
 }
 
 void Enemy::enemyClear()
@@ -33,7 +24,9 @@ void Enemy::enemyClear()
 	m_enemyLocation= Location(0, 0);
 }
 
-bool Enemy::isOnLadder(std::vector<std::string> level)const {
+bool Enemy::isOnLadder(std::vector<std::string> level)const 
+{
+    //to find ladder up or down
     int up = m_enemyLocation.row - 1, down = m_enemyLocation.row + 1;
 
     if (level[up][m_enemyLocation.col] == 'H' ||
@@ -43,15 +36,17 @@ bool Enemy::isOnLadder(std::vector<std::string> level)const {
     return 0;
 }
 
-bool Enemy::isClimbing(std::vector<std::string> level)const {
+bool Enemy::isClimbing(std::vector<std::string> level)const 
+{
     if (level[m_enemyLocation.row][m_enemyLocation.col] == 'H') {
         return 1;
     }
     return 0;
-
 }
 
-bool Enemy::isOnRope(std::vector<std::string> level)const {
+bool Enemy::isOnRope(std::vector<std::string> level)const 
+{
+    //to find rope above
     int up = m_enemyLocation.row - 1;
 
     if (level[up][m_enemyLocation.col] == '-') {
@@ -59,25 +54,33 @@ bool Enemy::isOnRope(std::vector<std::string> level)const {
     }
     return 0;
 }
-void Enemy::setOnLadder(int On) {
+
+void Enemy::setOnLadder(int On) 
+{
     m_onLadder = On;
 }
 
-
-void Enemy::setCoin(int On){
+void Enemy::setCoin(int On)
+{
     m_onCoin = On;
 }
 
-bool Enemy::getOnCoin() {
+bool Enemy::getOnCoin() 
+{
     return m_onCoin;
 }
 
-bool Enemy::getOnLadder()const {
+bool Enemy::getOnLadder()const 
+{
     return  m_onLadder;
 }
-void Enemy::setOnRope(int On) {
+
+void Enemy::setOnRope(int On) 
+{
     m_onRope = On;
 }
-bool Enemy::getOnRope()const {
+
+bool Enemy::getOnRope()const 
+{
     return m_onRope;
 }

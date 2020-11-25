@@ -28,11 +28,10 @@ private:
 
 
 public:
-    Board();
-    //Board~
-    void setLevel1();
-    void resetGame();
-    void setScore();
+    Board(); //constructor of Board
+
+    void setLevel1(); //set the first level after restarting game
+    void resetGame(); //reset the game after loseing
     void setLevel(std::vector<std::string> newMap);
     void setLastLevel(std::vector<std::string> newMap);
     void BuildLevel();
@@ -58,5 +57,6 @@ public:
     bool isNextOnRope(Location location)const;
     bool isNextOnLadder(Location location)const;
     bool isSpace(Location location)const;
+    ~Board(); //distructor of Board
 };
 
