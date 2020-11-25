@@ -135,13 +135,16 @@ void GameController::handleSpecialKey()
         if (i >= m_enemyArmy.size()) {
             break;
         }
-        m_enemyArmy[i].setEnemy(dest);
+        if (m_enemyArmy.size() != 0) {
+            m_enemyArmy[i].setEnemy(dest);
 
-        if (!m_enemyArmy[i].isClimbing(map)) {
-            m_enemyArmy[i].setOnLadder(0);
-        }
+            if (!m_enemyArmy[i].isClimbing(map)) {
+                m_enemyArmy[i].setOnLadder(0);
+            }
             gravityEnemy(i);
-            gravity(c);
+            
+        }
+        gravity(c);
     }
    //m_enemy.enemyClear();
 }
@@ -678,7 +681,6 @@ void GameController::setNewLevel() {
     std::system("cls");
     m_level.clearLevel();
     m_level.BuildLevel();
-    //while for more enemys
     m_level.setLevel(m_level.getLevel());
     m_player.setShape('@');
     m_enemyArmy.clear();
@@ -770,6 +772,7 @@ void GameController::gameOver()
 }
 //----------------------------------------------------------------------------
 void GameController::endGame() {
+
     if (m_player.getLife() == 0) {
         gameOver();
         setTotalScore('E');
