@@ -19,8 +19,8 @@ private:
     int m_maxScore;
 
     bool m_touchrope;
-    Location findRope(int i);
-    Location findLadder(char direction, int i);
+    Location findRope(int i, int& steps);
+    Location findLadder(char direction, int i,int& steps);
     void setScore(char upOrDown);
     void setTotalScore(char upOrDown);
     bool handleRegularKey(int c);
@@ -43,6 +43,7 @@ private:
     void endGame();
     void setArmy();
     bool hitEnemy();
+    void ReturnLastChar(Location location, std::vector<std::string>& currentMap);
 public:
 
     GameController();

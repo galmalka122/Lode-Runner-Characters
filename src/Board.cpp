@@ -16,8 +16,6 @@ void Board::printBoard(Player player, std::vector<Enemy> enemy) {
     Screen::resetLocation();
     for (enemys = 0; enemys < getArmySize(); enemys++) {
         for (unsigned int i = 0; i < m_size; i++) {
-            if (i == player.getCurrentLocation().row)
-                m_level[i][player.getCurrentLocation().col] = player.getShape();
             for (unsigned int j = 0; j < m_size; j++) {
                 if (i == enemy[enemys].getCurrentLocation().row &&
                     j == enemy[enemys].getCurrentLocation().col) {
@@ -26,6 +24,11 @@ void Board::printBoard(Player player, std::vector<Enemy> enemy) {
             }
         }
     }
+    for (unsigned int i = 0; i < m_size; i++) {
+        if (i == player.getCurrentLocation().row)
+            m_level[i][player.getCurrentLocation().col] = player.getShape();
+    }
+
     for (int i = 0; i < m_size; i++)
         std::cout << m_level[i] << std::endl;
 }
@@ -194,8 +197,10 @@ bool Board::isNextCoin(Location location) const{
 }
 
 bool Board::isNextOnRope(Location location)const {
-
     auto ropeAbove = location.row - 1;
+    if (ropeAbove < 0) {
+        return 0;
+    }
     if (m_level[ropeAbove][location.col] == '-') {
         return 1;
     }
