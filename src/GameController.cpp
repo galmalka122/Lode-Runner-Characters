@@ -2,18 +2,21 @@
 //----------------------------------------------------------------------------
 GameController::GameController():m_totalScore(0), m_score(0), m_maxScore(0),
                                             m_touchrope(0), m_coinsCount(0){
-
+    //set player location
     m_player.setPlayer(m_level.getPlayer());
+    //set map
     m_level.getLevel();
+    //Get army of enemys
     setArmy();
+    //Max score of level
     setMaxScore();
-
 }
 //----------------------------------------------------------------------------
 
 void GameController::setArmy() {
     Enemy enemy;
     m_enemyArmy.clear();
+    //finding enemys in the map, and insert them in to array of enemys
     for (int i = 0; i < m_level.getArmySize(); i++) {
         enemy.setEnemy(m_level.getEnemy());
         m_enemyArmy.push_back(enemy);
@@ -22,6 +25,7 @@ void GameController::setArmy() {
 
 void GameController::play(){
 
+    //GAME LOOP
     for (auto exit = false; !exit;)
     {
      
@@ -42,11 +46,13 @@ void GameController::play(){
         //if player hit enemy
         if (hitEnemy()) {
 
+            //If player takes coin right before touching enemy
             if (m_maxScore != m_score) {
                 endGame();
             }  
         }
         else {
+            //Moving board next step After all objacts updated
             moveOnBoard();
 
             auto c = Keyboard::getch();
@@ -70,14 +76,6 @@ bool GameController::handleRegularKey(int c)
 {
     switch (c)
     {
-        case 'A':
-            std::cout << "A pressed\n";
-            break;
-
-        case 'a':
-            std::cout << "a pressed\n";
-            break;
-
         case KB_ESCAPE:
             std::cout << "Escape pressed. Exiting...\n";
             return true;
@@ -93,29 +91,34 @@ void GameController::handleSpecialKey()
 {
     auto c = Keyboard::getch();
     
-    auto location = m_player.getCurrentLocation();
-    auto map = m_level.getLevel();
+    auto location = m_player.getCurrentLocation(); //gets player location
+
+    auto map = m_level.getLevel(); //gets current map
     switch (c)
     {
         case KB_UP:
+            //Player Choose to move up
             if (isValidPlayer(m_player.findLocation(c, 'N'), map, location))
                 return;
             m_level.setLevel(map);
             m_player.setPlayer(m_player.findLocation(c, 'N'));
             break;
         case KB_DOWN:
+            //Player Choose to move down
             if (isValidPlayer(m_player.findLocation(c, 'N'), map, location))
                 return;
             m_level.setLevel(map);
             m_player.setPlayer(m_player.findLocation(c, 'N'));
             break;
         case KB_LEFT:
+            //Player Choose to move left
             if (isValidPlayer(m_player.findLocation(c, 'N'), map,location))
                 return;
             m_level.setLevel(map);
             m_player.setPlayer(m_player.findLocation(c, 'N'));
             break;
         case KB_RIGHT:
+            //Player Choose to move right
             if (isValidPlayer(m_player.findLocation(c, 'N'), map, location))
                 return;
             m_level.setLevel(map);
@@ -125,25 +128,35 @@ void GameController::handleSpecialKey()
             std::cout << "Unknown special key pressed (code = " << c << ")\n";
             break;
     }
+
+    gravity(c); //Gravity of player
+
     for (int i = 0; i < m_enemyArmy.size(); i++) {
-        auto dest = moveEnemy(i);
+        //loop going on each enemy right movement
+        auto dest = moveEnemy(i); //gets enemy position
         if (map[dest.row][dest.col] == '%') {
+            //if enemy right now position is on 
+            //other enemy, enemy is deleted.
+            //(both go into same directions)
             m_enemyArmy.erase(m_enemyArmy.begin() + i);
             m_level.setArmySize(m_enemyArmy.size());
-            map[location.row][location.col] = ' ';
+            ReturnLastChar(location, map);
         }
         if (i >= m_enemyArmy.size()) {
+            //after we delete enemys, enemys size is changed.
+            //in order to not get any array exceptions,
+            //checks if index bigger the enemys size.
             break;
         }
         m_enemyArmy[i].setEnemy(dest);
 
         if (!m_enemyArmy[i].isClimbing(map)) {
+            //if enemy is not climbing on ladder, we 
+            //go in and turn of the flag
             m_enemyArmy[i].setOnLadder(0);
         }
-            gravityEnemy(i);
-            gravity(c);
+            gravityEnemy(i); //Gravity for each enemy
     }
-   //m_enemy.enemyClear();
 }
 //----------------------------------------------------------------------------
 bool GameController::isValidPlayer(Location destination, std::vector<std::string> &currentMap,Location currentLocation) {
@@ -177,15 +190,16 @@ bool GameController::isValidPlayer(Location destination, std::vector<std::string
         //if coming from floor
         else {
 
+            //If we already on rope or ladder
             m_player.setShape('S');
             currentMap[currentLocation.row][currentLocation.col] = ' ';
         }
 
+        //next step is to collect coin
         if (m_level.isNextCoin(destination)) {
             setScore('U');
             setTotalScore('A');
         }
-
         return 0;
     }
 
@@ -193,13 +207,14 @@ bool GameController::isValidPlayer(Location destination, std::vector<std::string
     else if (m_player.getShape() == 'S' && (m_level.isNextSpace(destination) || m_level.isNextCoin(destination)
         || m_level.getLevel()[destination.row][destination.col] == '-')) {
 
+        //next step is to collect coin
         if (m_level.isNextCoin(destination)) {
             setScore('U');
             setTotalScore('A');
         }
         //from rope to ground
         if (m_player.isOnRope(m_level.getLevel())) {
-
+            //trying to go up when player is on rope (not valid movment) 
             if (nextStep(currentLocation, destination) == 'U') {
                 return 1;
             }
@@ -394,35 +409,35 @@ char GameController::nextStep(Location current, Location destention) {
 }
 //----------------------------------------------------------------------------
 Location GameController::moveEnemy(int i) {
-    //unfinished!!!!!!!!!
-    auto map = m_level.getLevel();
-    auto location = m_enemyArmy[i].getCurrentLocation();
+    auto map = m_level.getLevel();  //gets current map
+    auto location = m_enemyArmy[i].getCurrentLocation(); //gets current Enemy location
+    
+    //Steps counters
+    int enemyStepsToLadder=0, enemyStepsToRope = 0;
+    
+    //Destination's of enemy
     Location destLadder(0,0),destRope(0,0);
+
+    //If player Beneath enemy
     if (m_player.getCurrentLocation().row < location.row ) {
-        destLadder = findLadder('U',i);
+        //finds location of close ladder
+        destLadder = findLadder('U',i, enemyStepsToLadder);
+        
+        //If enemy is already on a ladder
         if (m_level.getCurrentChar(m_enemyArmy[i].getCurrentLocation()) == 'H') {
+
+            //Going down on the ladder 
             if (m_enemyArmy[i].getOnLadder()) {
-                map[location.row][location.col] = m_level.getCurrentChar(location);
-                m_level.setLevel(map);
+                ReturnLastChar(location, map);
                 return Location(location.row - 1, location.col);
             }
-            map[location.row][location.col] = m_level.getCurrentChar(location);
-            m_level.setLevel(map);
+            //Activate flag of enemy on Ladder then going down
+            ReturnLastChar(location, map); //Return last char deleted
             m_enemyArmy[i].setOnLadder(1);
             return Location(location.row - 1, location.col);
         }
-        if (m_level.getCurrentChar(Location(location.row - 1, location.col)) == 'H') {
-            if (m_enemyArmy[i].getOnLadder()) {
-                map[location.row][location.col] = m_level.getCurrentChar(location);
-                m_level.setLevel(map);
-                return Location(location.row - 1, location.col);
-            }
-            map[location.row][location.col] = m_level.getCurrentChar(location);
-            m_level.setLevel(map);
-            m_enemyArmy[i].setOnLadder(1);
-            return Location(location.row - 1, location.col);
-        }
-        if (isValidEnemy(findLadder('U',i), map, location,i)) {
+        //Checks validation of movement
+        if (isValidEnemy(destLadder, map, location,i)) {
             return(location);
         }
         m_level.setLevel(map);
@@ -433,32 +448,28 @@ Location GameController::moveEnemy(int i) {
     {
 
         if (m_enemyArmy[i].isOnRope(map)) {
-            map[location.row][location.col] = m_level.getCurrentChar(location);
-            m_level.setLevel(map);
+            ReturnLastChar(location, map);
             m_enemyArmy[i].setOnRope(0);
             return Location(location.row + 1, location.col);
         }
         if (m_level.getCurrentChar(Location(location.row + 1, location.col)) == 'H') {
             if (m_enemyArmy[i].getOnLadder()) {
-                map[location.row][location.col] = m_level.getCurrentChar(location);
-                m_level.setLevel(map);
+                ReturnLastChar(location, map);
                 return Location(location.row + 1, location.col);
             }
-            map[location.row][location.col] = m_level.getCurrentChar(location);
-            m_level.setLevel(map);
+            ReturnLastChar(location, map);
             m_enemyArmy[i].setOnLadder(1);
             return Location(location.row + 1, location.col);
         }
-        destLadder = findLadder('D', i);
-        destRope = findRope(i);
+        destLadder = findLadder('D', i, enemyStepsToLadder);
+        destRope = findRope(i, enemyStepsToRope);
         if (destRope.col != 0 && destLadder.col != 0) {
-            if (destRope.col - location.col < destLadder.col - location.col) {
+            if (enemyStepsToRope < enemyStepsToLadder) {
 
                 if (m_enemyArmy[i].isOnRope(map) ||
                     m_level.getCurrentChar(Location(location.row - 1, location.col)) == '-') {
 
-                    map[location.row][location.col] = m_level.getCurrentChar(location);
-                    m_level.setLevel(map);
+                    ReturnLastChar(location, map);
                     m_enemyArmy[i].setOnRope(1);
                     return Location(location.row + 1, location.col);
                 }
@@ -484,8 +495,7 @@ Location GameController::moveEnemy(int i) {
             if (m_enemyArmy[i].isOnRope(map) ||
                 m_level.getCurrentChar(Location(location.row - 1, location.col)) == '-') {
 
-                map[location.row][location.col] = m_level.getCurrentChar(location);
-                m_level.setLevel(map);
+                ReturnLastChar(location, map);
                 m_enemyArmy[i].setOnRope(1);
                 return Location(location.row + 1, location.col);
             }
@@ -498,23 +508,19 @@ Location GameController::moveEnemy(int i) {
         else {
             if (m_level.getCurrentChar(m_enemyArmy[i].getCurrentLocation()) == 'H') {
                 if (m_enemyArmy[i].getOnLadder()) {
-                    map[location.row][location.col] = m_level.getCurrentChar(location);
-                    m_level.setLevel(map);
+                    ReturnLastChar(location, map);
                     return Location(location.row + 1, location.col);
                 }
-                map[location.row][location.col] = m_level.getCurrentChar(location);
-                m_level.setLevel(map);
+                ReturnLastChar(location, map);
                 m_enemyArmy[i].setOnLadder(1);
                 return Location(location.row + 1, location.col);
             }
             if (m_level.getCurrentChar(Location(location.row + 1, location.col)) == 'H') {
                 if (m_enemyArmy[i].getOnLadder()) {
-                    map[location.row][location.col] = m_level.getCurrentChar(location);
-                    m_level.setLevel(map);
+                    ReturnLastChar(location, map);
                     return Location(location.row + 1, location.col);
                 }
-                map[location.row][location.col] = m_level.getCurrentChar(location);
-                m_level.setLevel(map);
+                ReturnLastChar(location, map);
                 m_enemyArmy[i].setOnLadder(1);
                 return Location(location.row + 1, location.col);
             }
@@ -546,7 +552,7 @@ Location GameController::moveEnemy(int i) {
 }
 
 
-Location GameController::findLadder(char direction,int i) {
+Location GameController::findLadder(char direction,int i,int &steps) {
     auto map = m_level.getLevel();
     auto location = m_enemyArmy[i].getCurrentLocation();
     int col = location.col,
@@ -558,22 +564,26 @@ Location GameController::findLadder(char direction,int i) {
 
     if (m_player.getCurrentLocation().col < location.col) {
         while (map[location.row][col] != '#') {
-            if (map[directionToMove][col] == 'H') {
+            if (m_level.getCurrentChar(Location(directionToMove, col)) == 'H') {
+                steps = location.col - col;
                 return(Location(location.row, location.col-1));
             }
+            
             col--;
         }
     }
     col = location.col;
     while (map[location.row][col] != '#') {
-            if (map[directionToMove][col] == 'H') {
+            if (m_level.getCurrentChar(Location(directionToMove, col)) == 'H') {
+                steps = col - location.col;
                 return(Location(location.row, location.col + 1));
             }
             col++;
         }
     col = location.col;
     while (map[location.row][col] != '#') {
-        if (map[directionToMove][col] == 'H') {
+        if (m_level.getCurrentChar(Location(directionToMove, col)) == 'H') {
+            steps = location.col - col;
             return(Location(location.row, location.col-1));
         }
         col--;
@@ -583,7 +593,7 @@ Location GameController::findLadder(char direction,int i) {
 }
 
 
-Location GameController::findRope( int i) {
+Location GameController::findRope( int i, int& steps) {
     auto map = m_level.getLevel();
     auto location = m_enemyArmy[i].getCurrentLocation();
     int col = location.col,
@@ -591,7 +601,8 @@ Location GameController::findRope( int i) {
 
     if (m_player.getCurrentLocation().col < location.col) {
         while (map[location.row][col] != '#') {
-            if (map[directionToMove][col] == '-') {
+            if (m_level.getCurrentChar(Location(directionToMove, col)) == '-') {
+                steps = location.col - col;
                 return(Location(location.row, location.col - 1));
             }
             col--;
@@ -599,14 +610,16 @@ Location GameController::findRope( int i) {
     }
     col = location.col;
     while (map[location.row][col] != '#') {
-        if (map[directionToMove][col] == '-') {
+        if (m_level.getCurrentChar(Location(directionToMove, col)) == '-') {
+            steps = col - location.col;
             return(Location(location.row, location.col + 1));
         }
         col++;
     }
     col = location.col;
     while (map[location.row][col] != '#') {
-        if (map[directionToMove][col] == '-') {
+        if (m_level.getCurrentChar(Location(directionToMove, col)) == '-') {
+            steps = location.col - col;
             return(Location(location.row, location.col - 1));
         }
         col--;
@@ -641,11 +654,9 @@ bool GameController::isValidEnemy(Location destination,
             currentMap[currentLocation.row][currentLocation.col] = 'H';
         }
         else if (m_enemyArmy[i].isOnRope(currentMap)) {
-            currentMap[destination.row][currentLocation.col] = '-';
+            currentMap[destination.row-1][currentLocation.col] = '-';
         }
-        else {
-            currentMap[destination.row][currentLocation.col] = ' ';
-        }
+        currentMap[destination.row][currentLocation.col] = ' ';
         m_enemyArmy[i].setOnLadder(1);
         return 0;
     }
@@ -801,4 +812,9 @@ bool GameController::hitEnemy() {
         }
     }
     return 0;
+}
+
+void GameController::ReturnLastChar(Location location, std::vector<std::string>& map) {
+    map[location.row][location.col] = m_level.getCurrentChar(location);
+    m_level.setLevel(map);
 }
