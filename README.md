@@ -1,6 +1,6 @@
 creators:
   
-  gal meir malka-201647211 and yaniv sonino-207205683
+  gal meir malka and yaniv sonino
 
 description:
 
